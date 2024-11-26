@@ -188,5 +188,14 @@ With my modified parameters, my model fails 1 out of 50 years. Meaning that the 
 
 ```{julia}
 reliability_percentage = (49/50)*100
+```
 
 Reliability percentage of the model is 98%. This suggests that the model is effective and has a higher probability of decreasing the chances of having the tank running dry. Hence, we can conclude that there is very low chance of system or model failure. 
+
+## Identify a Gap in the Methods
+
+Thinking about a limitation to the data quality is that we currently can't forsee for severe disasters or  droughts. Today, climate conditions are a lot more unpredictable and the model from 50 years ago can be very different to today. For either technological advancements or even the unforseen extreme weather changes. 
+
+Obviously it is hard to create a new model or even a more advanced that would improve the accuracy of any model in this aspect. Especially one that would be tailored specifically to analyze water harvest collection for a single household in northeast Brazil. 
+
+Adding a variable or a model will help in accuracy not only from the model as a whole but also to each specific limitation and approximation. 
