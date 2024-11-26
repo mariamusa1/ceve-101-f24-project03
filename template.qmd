@@ -11,7 +11,7 @@ format:
     docx: default
 ---
 
-We begin by loading the required packages.
+## Reading the Data 
 
 ```{julia}
 using Revise                      # <1>
@@ -48,13 +48,25 @@ plot(rainfall_data) # <1>
 
 1. This `plot` function is defined in [viz.jl](./RainwaterHarvesting/src/viz.jl) and is a thin wrapper around the Plots.jl package.
 
-### Discussion
+### Analyzing Available Data
 
-*Insert discussion here*
+After analyzing the data in the second data package, we can conclude that there is available data for all years from 1974 to 2024.
+
+The available data is sufficient to conduct meaningful risk assessments since we don't necessarily see any gaps or missing years over the span of 50 years.
+
+### Investigating Historical Droughts  
+
+There are a couple of periods in history in which Ceará has suffered greatly from major droughts. These include 1877-1879, 1915, 1931, 1973, 1983, 1993, 1998, and the last major drought period which was from 2012-2017. 
+
+As our data begins in 1974, we do have the data from all the time as from that year to today. However, there are a couple of hitorical droughts that could be useful for our data but are not recent enough to be recorded in the chosen record. It does not cause any risks from the time period in which the graph analyses, but having some previous data could help with enhancing the general accuracy of this investigation. 
 
 ## Understanding the Theoretical Model
 
-Let's explore the model that simulates the rainwater harvesting system.
+### Limiting Assumptions and Approximations in the Model
+
+
+
+### Modifying the Model to Relax these Assumptions
 
 ### Mass Balance Equation
 
