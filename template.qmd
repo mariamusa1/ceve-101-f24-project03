@@ -58,7 +58,7 @@ For the Consumption equation, I think the main limitation in the model is assumi
 
 ### Modifying the Model to Relax these Assumptions
 
-For the Mass Balance Equation we subtract another variable from the equation to account for any problems, leakages, and functionality. 
+For the Mass Balance Equation we subtract another variable from the equation to account for any problems, leakages, and functionality. This can help in the approximation of the total mass balance of the rainwater tank.
 
 Let's call this variable "Losses"
 $L_t$
@@ -68,27 +68,21 @@ V_{t+1} = V_t + Q_t - C_t - L_t| 0 \leq V_t \leq V_\text{max}
 $$
 
 
-For the consumption equation, we could modify the fixed 74.1 when day of the year > 150. Taking into consideration consumption to a specific household by resident size. 
+For the consumption equation, we could modify the fixed 74.1 when day of the year > 150. Taking into consideration average consumption per person to a specific household by resident size. This helps scale the needed changes for the rainwater tanks in Brazil as according to each household size. 
 
 $$
 C_t = \begin{cases}
-    averageconsumption*household_residents & \quad \text{day of year} > 150 \\
+    averageconsumptionpp*householdresidents & \quad \text{day of year} > 150 \\
     0 & \quad \text{day of year} \leq 150
 \end{cases}
 $$
 
-This makes two major assumptiuons.
-First, the household begins using water from the tank after the 150th day of the year.
-This is based on the idea that the rainy season lasts for about the first 150 days of the year, and so they may have other sources of water before then.
-The second assumption is that each household consumes 74.1 liters per day during the dry season.
-How does this compare to your household's water usage?
 
 ## Model Implementation and Testing
 
 ### Defining the Model Parameters
 
-We can define the model parameters with sensible default values.
-You will have the opportunity to change these values later.
+Model parameters with sensible default values:
 
 ```{julia}
 #| output: false
@@ -100,15 +94,7 @@ param = ModelParameters(          # <1>
 )
 ```
 
-1. This creates a `ModelParameters` object with the specified parameters.
-2. The runoff coefficient ($\eta$) is a measure of how much of the rain that falls on the roof ends up in the tank.
-3. The roof area ($A$) is the area of the roof that the rain falls on.
-4. The first flush volume ($V_f$) is the volume of rain that is discarded because it is dirty.
-5. The tank capacity ($V_\text{max}$) is the maximum volume of the tank.
-
-### Running the Simulation for One Year
-
-Let's run the model for the year 1981.
+Default model for the year 1981.
 
 ```{julia}
 rainfall_1981 = rainfall_data.annual_data[1981]    # <1>
@@ -116,24 +102,80 @@ results_1981 = run_timesteps(rainfall_1981, param) # <2>
 p1 = plot(results_1981)                                 # <3>
 ```
 
-1. We select the annual rainfall data for the year 1981.
-2. We run the simulation for the year 1981.
-3. We plot the results, again using a `plot` function defined in [viz.jl](./RainwaterHarvesting/src/viz.jl).
-
-To compare rainfall and tank volume:
+Comparing rainfall and tank volume with the default parameters:
 
 ```{julia}
 p2 = plot(rainfall_1981)
 plot(p2, p1, layout=(2, 1), size=(1000, 700), link=:x)
 ```
 
-Observe how the tank's water level responds to rainfall events.
-Note any periods when the tank runs dry or overflows.
+
+### Modification to Model Parameters #1
+
+Increasing the runoff coefficient of the model.
+
+```{julia}
+#| output: false
+param = ModelParameters(          # <1>
+    runoff_coefficient=0.95,      # <2>
+    roof_area_m2=45.0,            # <3>
+    first_flush_mm=2.0,           # <4>
+    tank_capacity_L=16000.0       # <5>
+)
+```
+
+Plot of the model for 1981 with runoff coefficients 
+
+```{julia}
+rainfall_1981 = rainfall_data.annual_data[1981]    # <1>
+results_1981 = run_timesteps(rainfall_1981, param) # <2>
+p1 = plot(results_1981)                                 # <3>
+```
+
+Comparing rainfall and tank volume with the modified runoff parameters:
+```{julia}
+p2 = plot(rainfall_1981)
+plot(p2, p1, layout=(2, 1), size=(1000, 700), link=:x)
+```
+
+I chose to modify the Runoff parameter by increase it since it would improve the efficiency of water collection. Hence, improving rainwater collection for the water harvest collection for the household in the northeast Brazil. This would help minimize any water lost during droughts and also for the prevention of droughts in rain season. 
+
+From the results, we see that the tank retains water for longer during the year, especially during periods of decreased daily rainfall. 
+
+
+### Modification to Model Parameters #2
+
+My second modification would be to increase roof area parameter. This increase wouldn't be very big since realistically it involves infrastructure that can be harder to implement in northeast Brazil.
+
+```{julia}
+#| output: false
+param = ModelParameters(          # <1>
+    runoff_coefficient=0.95,      # <2>
+    roof_area_m2=55.0,            # <3>
+    first_flush_mm=2.0,           # <4>
+    tank_capacity_L=16000.0       # <5>
+)
+```
+
+Plot of the model for 1981 with increased roof area 
+
+```{julia}
+rainfall_1981 = rainfall_data.annual_data[1981]    # <1>
+results_1981 = run_timesteps(rainfall_1981, param) # <2>
+p1 = plot(results_1981)                                 # <3>
+```
+
+Comparing rainfall and tank volume with the modified roof area parameter:
+```{julia}
+p2 = plot(rainfall_1981)
+plot(p2, p1, layout=(2, 1), size=(1000, 700), link=:x)
+```
+
+I chose to modify the roof area, as I thought increasing it would maximize rainwater collection during rain seasons to prepare households for droughts. 
+
+Surprisingly, the effect of modifying these parameters did not have a larger effect than modifying the runoff coefficient. I suspect this is because the parameter was not increased dramatically. But, thinking realistically, it wouldn't make sense. So, maybe I cocnlude that collection efficiency has a larger effect than increasing the roof area. 
 
 ### Reliability Analysis
-
-We can run simulations for all years, one at a time, and then check how many times the tank runs dry.
-You can run simulations for all years at once with the following code:
 
 ```{julia}
 all_years = sort(collect(keys(rainfall_data.annual_data)))          # <1>
@@ -142,7 +184,9 @@ any_failures = [!isempty(result.failure_dates) for result in all_results]  # <3>
 println("Number of years with failures: ", sum(any_failures), " out of ", length(all_years))  # <4>
 ```
 
-1. We get all the years in order.
-2. We run the simulation for each year.
-3. We check if any failures occurred.
-4. We print the number of years with failures and the total number of years.
+With my modified parameters, my model fails 1 out of 50 years. Meaning that the tank ran dry 1 out of 50 times (years). 
+
+```{julia}
+reliability_percentage = (49/50)*100
+
+Reliability percentage of the model is 98%. This suggests that the model is effective and has a higher probability of decreasing the chances of having the tank running dry. Hence, we can conclude that there is very low chance of system or model failure. 
