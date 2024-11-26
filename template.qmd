@@ -51,43 +51,28 @@ As our data begins in 1974, we do have the data from all the time as from that y
 
 ### Limiting Assumptions and Approximations in the Model
 
+For the Mass Balance Equation, I figured that the model did not take into consideration any possible outside factors that could affect the volume of water in the tank. Some examples could be overflowing, problems with the tank's functionality, and leakage. Originally, the only source of removal of water is from the (consumption)$C_t$ variable. 
+
+For the Consumption equation, I think the main limitation in the model is assuming that all households consume the same 74.1 liters per day during the dry season. Furthermore, having the 150 days as a fixed number of the rainy days per year is also a limitation since we have seen how there are varying rainy days in every different year. 
 
 
 ### Modifying the Model to Relax these Assumptions
 
-### Mass Balance Equation
+For the Mass Balance Equation we subtract another variable from the equation to account for any problems, leakages, and functionality. 
 
-The mass balance model for the rainwater tank is given by:
-
-$$
-V_{t+1} = V_t + Q_t - C_t | 0 \leq V_t \leq V_\text{max}
-$$
-
-- $V_t$: the volume of water in the tank at time $t$
-- $Q_t$ is the volume of water added to the tank at time $t$
-- $C_t$ is the volume of water consumed at time $t$
-- $V_\text{max}$: the maximum volume of the tank
-
-### Inflow ($Q_t$)
-
-Inflow is calculated as
+Let's call this variable "Losses"
+$L_t$
 
 $$
-Q_t = \eta \times A \times \max(P_t - F, 0).
+V_{t+1} = V_t + Q_t - C_t - L_t| 0 \leq V_t \leq V_\text{max}
 $$
 
-- $\eta$: the runoff coefficient, which accounts for losses due to evaporation, spilling, etc.
-- $A$: the area of the roof (we will use square meters)
-- $P_t$: the precipitation at time $t$ (we will use millimeters per day)
-- $F$: the first flush volume (we will use millimeters). The first flush volume is often discarded, so that each time it rains the first bit of water (which is usually dirty) is not used (see [here](https://rainwaterharvesting.tamu.edu/pre-storage-treatment/) for more details).
 
-### Consumption
-
-Consumption is modeled as:
+For the consumption equation, we could modify the fixed 74.1 when day of the year > 150. Taking into consideration consumption to a specific household by resident size. 
 
 $$
 C_t = \begin{cases}
-    74.1 & \quad \text{day of year} > 150 \\
+    averageconsumption*household_residents & \quad \text{day of year} > 150 \\
     0 & \quad \text{day of year} \leq 150
 \end{cases}
 $$
