@@ -18,35 +18,22 @@ using Revise                      # <1>
 using RainwaterHarvesting         # <2>
 ```
 
-1. `Revise` allows us to update code without restarting Julia.
-2. We load the `RainwaterHarvesting` package that contains our simulation tools.
 
 ### Setting the file path
 
-Next, we specify the path to the rainfall data file and read it in.
+Selected file with data package #2
 
 ```{julia}
 filepath = "data/2.txt" # <1>   
 rainfall_data = RainfallData(filepath) # <2>
 ```
 
-1. This is the path to the rainfall data file for the station of interest.
-2. This creates a `RainfallData` object containing the rainfall data for the specified station.
-
-If we dig under the hood a bit, we can see that there are two main pieces of information:
-
-- `station_info`: a dictionary containing information about the station, such as its name and location.
-- `annual_data`: a dictionary mapping years to `AnnualRainfallData` objects, each containing the date and precipitation data for a given year.
-
 ### Plotting the Data
-
-We can plot the data for one or all of the years to verify that it looks correct.
 
 ```{julia}
 plot(rainfall_data) # <1>
 ```
 
-1. This `plot` function is defined in [viz.jl](./RainwaterHarvesting/src/viz.jl) and is a thin wrapper around the Plots.jl package.
 
 ### Analyzing Available Data
 
